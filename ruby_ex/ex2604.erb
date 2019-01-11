@@ -1,0 +1,24 @@
+% require 'rubygems'
+% require 'dbi'
+
+% dbh = DBI.connect( 'DBI:SQLite3:fruits01.db' )
+
+%# テーブルからデータを読み込んで表示する
+%# select文の実行
+% sth = dbh.execute("select * from products")
+
+%# select文の実行結果を１件ずつrowに取り出し、繰り返し処理する
+% sth.each do |row|
+<ul>
+%# each_with_nameメソッドで値と項目名を１件分ずつ取り出して表示する
+%   row.each_with_name do |val, name|
+      <li><%= "#{name}: #{val.to_s}" %></li>
+%    end
+</ul>
+% end
+
+%# 実行結果を解放する
+% sth.finish
+
+%# データベースとの接続を終了する
+% dbh.disconnect

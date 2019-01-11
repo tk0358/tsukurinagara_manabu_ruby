@@ -1,0 +1,10 @@
+<% fruits = %w(apple banana cherry fig grape) %>
+<ul>
+<% fruits.each do |fruit| %>
+  <% if /a/ =~ fruit %>
+  <li><%= fruit %>: I like it.</li>
+  <% else %>
+  <li><%= fruit %></li>
+  <% end %>
+<% end %>
+</ul>
