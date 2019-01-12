@@ -86,6 +86,33 @@ server.mount_proc("/entry") { |req, res|
   end
 }
 
+# 検索の処理
+# "http://localhost:8099/retrieve"で呼び出される
+server.mount_proc("/retrieve") { |req, res|
+  # （注意）本来ならここで入力データに危険や不正がないかチェックするが、演習の見通しに割愛
+  p req.query #デバッグ用
+
+  # 検索条件の整理
+  a = %w(id title author page publish_date)
+  # 問い合わせ条件のある要素以外を削除
+  a.delete_if{|name| req.query[name] == "" }
+
+  if a.empty?
+    where_data = ""
+  else
+    # 残った要素を検索条件文字列に変換
+    a.map! {|name| "#{name}=\'#{req.query[name]}\'" }
+    # 要素があるときはwhere句に直す（現状、項目ごとの完全一致のorだけ）
+    where_data = "where " + a.join(' or ')
+  end
+
+  # 処理の結果を表示する
+  # ERBを、ERBHandlerを経由せずに直接呼び出して利用
+  template = ERB.new( File.read('retrieved.erb') )
+  res.body << template.result( binding )
+
+}
+
 # Ctrl-c割り込みがあった場合にサーバーを停止する処理を登録しておく
 trap(:INT) do
   server.shutdown
