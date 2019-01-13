@@ -132,6 +132,25 @@ server.mount_proc("/edit") { |req, res|
   res.body << template.result( binding )
 }
 
+# 削除の処理
+# "http://localhost:8099/delete" で呼び出される
+server.mount_proc("/delete") { |req, res|
+  # （注意）本来ならここで入力データに危険や不正がないかチェックするが、演習の見通しに割愛
+  p req.query
+  #dbhを作成し、データベース'bookinfo_sqlite.db'に接続
+  dbh = DBI.connect( 'DBI:SQLite3:bookinfo_sqlite.db' )
+
+  # テーブルからデータを削除する
+  dbh.do("delete from bookinfos where id='#{req.query['id']}';")
+
+  # データベースとの接続を終了する
+  dbh.disconnect
+  # 処理の結果を表示する
+  # ERBを、ERBHandlerを経由せずに直接呼び出して利用
+  template = ERB.new( File.read('deleted.erb') )
+  res.body << template.result( binding )
+}
+
 # Ctrl-c割り込みがあった場合にサーバーを停止する処理を登録しておく
 trap(:INT) do
   server.shutdown
